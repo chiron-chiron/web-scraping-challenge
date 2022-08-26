@@ -8,35 +8,50 @@ from selenium.webdriver.chrome.options import Options
 from splinter import Browser
 import pandas as pd
 
+
 ### NASA Mars News ###
+
+
+executable_path = {'executable_path': ChromeDriverManager().install()}
+
+
 
 def scrape():
 
+    # Setup splinter
+    executable_path = {'executable_path': ChromeDriverManager().install()}
+    browser = Browser('chrome', **executable_path, headless=False)
+    
     # URL of page to be scraped
     url_nasa_mars_news = 'https://mars.nasa.gov/news/'
         # Tried using link provided, couldn't get it to work. 
         # Was advised by classmate, to use above link.
         # Was later advised by AskBSC redplanetscience was correct link.
         # Will use links provided in readme, moving forward.
-
+    browser.visit(url_nasa_mars_news)
+    
     # Retrieve page, with requests module
     response_mars = requests.get(url_nasa_mars_news)
 
     # Create BeautifulSoup object; parse with 'html.parser'
-    soup = BeautifulSoup(response_mars.text, 'html.parser')
+    news_soup = BeautifulSoup(response_mars.text, 'html.parser')
     # print(soup.prettify())
 
     # Find all div elements and class, for news titles
-    news_titles = soup.find_all('div', class_="slide")
+    news_titles = news_soup.find_all('div', class_="slide")
+    
+    for titles in news_titles:
+        try:
+            # Retrieve latest news title
+            news_title = titles[0].find('div', class_='content_title').text.strip()
+            # news_title = latest_title.text.strip()
+            
+            # Retrieve corresponding latest news paragraph
+            news_p = news_titles[0].find('div', class_='rollover_description_inner').text.strip()
+            # news_p = latest_paragrapph.text.strip()
+        except AttributeError as AE
+            print(AE)
 
-    # Retrieve latest news title
-    latest_title = news_titles[0].find('div', class_='content_title')
-    news_title = latest_title.text.strip()
-    
-    # Retrieve corresponding latest news paragraph
-    latest_paragrapph = news_titles[0].find('div', class_='rollover_description_inner')
-    news_p = latest_paragrapph.text.strip()
-    
 
 
     ### JPL Mars Space Images - Featured Image ###
@@ -94,7 +109,7 @@ def scrape():
 
     # Convert df to HTML table string, using pandas
     mars_facts_html = mars_facts_df.to_html
-    mars_facts_html
+    # mars_facts_html
 
 
 
